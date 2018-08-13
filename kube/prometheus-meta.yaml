@@ -22,7 +22,7 @@ spec:
         runAsUser: 0
       containers:
       - name: prometheus
-        image: gcr.io/prometheus-to-sd/prometheus:freinartz
+        image: gcr.io/prometheus-to-sd/prometheus:jkohen
         imagePullPolicy: Always
         args:
         - "--config.file=/etc/prometheus/config/prometheus.yaml"
@@ -79,8 +79,9 @@ data:
       scrape_interval: 10s
     scrape_configs:
     - job_name: 'prometheus'
-      kubernetes_sd_configs:
-      - role: endpoints
+      gce_sd_configs:
+      - project: prometheus-to-sd
+        zone: us-central1-a
       relabel_configs:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
