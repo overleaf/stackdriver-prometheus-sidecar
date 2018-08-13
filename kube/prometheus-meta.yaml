@@ -38,6 +38,11 @@ spec:
           mountPath: /etc/prometheus/config
         - name: data-volume
           mountPath: /data
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/prometheus-to-sd-ae006f387855.json
       - name: sidecar
         image: gcr.io/prometheus-to-sd/stackdriver-prometheus-sidecar:${SIDECAR_IMAGE_TAG}
         imagePullPolicy: Always
@@ -58,6 +63,9 @@ spec:
           name: prometheus-meta
       - name: data-volume
         emptyDir: {}
+      - name: google-cloud-key
+        secret:
+          secretName: gce-key
       terminationGracePeriodSeconds: 300
 ---
 apiVersion: v1
