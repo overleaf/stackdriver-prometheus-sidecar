@@ -15,6 +15,7 @@ package retrieval
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
@@ -333,6 +334,7 @@ func (c *seriesCache) refresh(ctx context.Context, ref uint64) error {
 		return errors.Wrap(err, "retrieving target failed")
 	}
 	if target == nil {
+		fmt.Println("no target found:", entry.lset)
 		ctx, _ = tag.New(ctx, tag.Insert(keyReason, "target_not_found"))
 		stats.Record(ctx, droppedSeries.M(1))
 		return nil
@@ -367,6 +369,7 @@ func (c *seriesCache) refresh(ctx context.Context, ref uint64) error {
 	)
 	metadata, err := c.metadata.Get(ctx, job, instance, metricName)
 	if err != nil {
+		fmt.Println("no metadata found:", job, instance, metricName)
 		return errors.Wrap(err, "get metadata")
 	}
 	if metadata == nil {

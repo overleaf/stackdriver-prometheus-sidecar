@@ -16,6 +16,7 @@ package targets
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
@@ -72,6 +73,7 @@ func (c *Cache) Run(ctx context.Context) {
 	for {
 		select {
 		case <-tick.C:
+			fmt.Println("refresh tick")
 			if err := c.refresh(ctx); err != nil {
 				level.Error(c.logger).Log("msg", "refresh failed", "err", err)
 			}
@@ -120,6 +122,15 @@ func (c *Cache) refresh(ctx context.Context) error {
 		}
 		repl[key] = append(repl[key], t)
 	}
+	// Carry over cached lookups for targets that could not be found.
+	for key, t := range c.targets {
+		if t != nil {
+			continue
+		}
+		if _, ok := repl[key]; !ok {
+			repl[key] = nil
+		}
+	}
 
 	c.targets = repl
 
@@ -144,14 +155,17 @@ func (c *Cache) Get(ctx context.Context, lset labels.Labels) (*Target, error) {
 	// This means for subsequent gets against the job/instance pair, requests will return
 	// no targets until a refresh triggered by another lookup or the background routine populates it.
 	if !ok {
+		fmt.Println("no cache entry for target", key, "– refreshing")
 		c.mtx.RUnlock()
 		err := c.refresh(ctx)
 		c.mtx.RLock()
 		if err != nil {
+			fmt.Println("refresh failed")
 			return nil, errors.Wrap(err, "target refresh failed")
 		}
 		if ts, ok = c.targets[key]; !ok {
 			// Set empty value so we don't refresh next time.
+			fmt.Println("set empty val for target", key)
 			c.targets[key] = nil
 			return nil, nil
 		}
