@@ -16,6 +16,7 @@ package retrieval
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -241,6 +242,7 @@ Outer:
 				outputSample, hash, samples, err = builder.next(ctx, samples)
 				if err != nil {
 					level.Warn(r.logger).Log("msg", "Failed to build sample", "err", err)
+					fmt.Printf("error: %v\n", err)
 					backoff = exponential(backoff)
 					continue
 				}

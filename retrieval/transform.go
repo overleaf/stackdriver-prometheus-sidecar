@@ -15,6 +15,7 @@ package retrieval
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -255,6 +256,12 @@ Loop:
 	// count series was missing.
 	if skip || resetTimestamp == 0 {
 		return nil, 0, samples[consumed:], nil
+	}
+	fmt.Printf("count: %v\n", count)
+	// Don't emit samples with negative counts, because Stackdriver will
+	// reject them. This should happy, so print a warning.
+	if count < 0 {
+		return nil, 0, samples[consumed:], fmt.Errorf("Rejecting distribution with negative count: %s", baseName)
 	}
 	// We do not assume that the buckets in the sample batch are in order, so we sort them again here.
 	// The code below relies on this to convert between Prometheus's and Stackdriver's bucketing approaches.

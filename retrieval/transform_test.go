@@ -365,6 +365,7 @@ func TestSampleBuilder(t *testing.T) {
 			metadata: metadataMap{
 				"job1/instance1/metric1":         &scrape.MetricMetadata{Type: textparse.MetricTypeHistogram, Metric: "metric1"},
 				"job1/instance1/metric1_a_count": &scrape.MetricMetadata{Type: textparse.MetricTypeGauge, Metric: "metric1_a_count"},
+				"job1/instance1/metric2":         &scrape.MetricMetadata{Type: textparse.MetricTypeHistogram, Metric: "metric2"},
 			},
 			series: seriesMap{
 				1: labels.FromStrings("job", "job1", "instance", "instance1", "__name__", "metric1_sum"),
@@ -380,6 +381,10 @@ func TestSampleBuilder(t *testing.T) {
 				9: labels.FromStrings("job", "job1", "instance", "instance1", "a", "b", "__name__", "metric1_count"),
 				// Series that triggers more edge cases.
 				10: labels.FromStrings("job", "job1", "instance", "instance1", "a", "b", "__name__", "metric1_a_count"),
+				// Negative count. No output.
+				11: labels.FromStrings("job", "job1", "instance", "instance1", "__name__", "metric2_sum"),
+				12: labels.FromStrings("job", "job1", "instance", "instance1", "__name__", "metric2_count"),
+				13: labels.FromStrings("job", "job1", "instance", "instance1", "__name__", "metric2_bucket", "le", "+Inf"),
 			},
 			input: []tsdb.RefSample{
 				// Mix up order of the series to test bucket sorting.
@@ -406,6 +411,15 @@ func TestSampleBuilder(t *testing.T) {
 				{Ref: 9, T: 2000, V: 13},
 				// New metric that actually matches the base name but the suffix is more more than a valid histogram suffix.
 				{Ref: 10, T: 1000, V: 3},
+				// Negative count. No output.
+				// First sample set, should be skipped by reset handling.
+				{Ref: 11, T: 1000, V: 123.4}, // sum
+				{Ref: 12, T: 1000, V: -1},    // count
+				{Ref: 13, T: 1000, V: 21},    // inf
+				// Second sample set, should be skipped due to error.
+				{Ref: 11, T: 2000, V: 123.4}, // sum
+				{Ref: 12, T: 2000, V: -1},    // count
+				{Ref: 13, T: 2000, V: 21},    // inf
 			},
 			result: []*monitoring_pb.TimeSeries{
 				nil, // 0: skipped by reset handling.
