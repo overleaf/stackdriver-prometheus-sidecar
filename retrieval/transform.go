@@ -96,6 +96,14 @@ func (b *sampleBuilder) next(ctx context.Context, samples []tsdb.RefSample) (*mo
 			if !ok {
 				return nil, 0, samples[1:], nil
 			}
+			var value int64
+			value = int64(v)
+			if value>=2^63-1 {
+				return nil, 0, samples[1:], nil
+			}
+			if value<=-2^63 {
+				return nil, 0, samples[1:], nil
+			}
 			point.Interval.StartTime = getTimestamp(resetTimestamp)
 			point.Value = &monitoring_pb.TypedValue{Value: &monitoring_pb.TypedValue_Int64Value{int64(v)}}
 		case "": // Actual quantiles.
