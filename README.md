@@ -10,7 +10,7 @@ Custom metrics are a chargeable feature of Stackdriver Monitoring and there coul
 
 ## Overleaf Development
 
-The `master` branch of this repository will follow the upstream `master`. Our internal pull requests will be merged into `overleaf/master`.
+The `master` branch of this repository will follow the upstream `master`. Our internal pull requests will be merged into `overleaf_master`.
 
 ### Process to update our master with lastest upstream master
 ```
@@ -18,20 +18,20 @@ git clone git@github.com:overleaf/stackdriver-prometheus-sidecar.git
 git remote add upstream https://github.com/Stackdriver/stackdriver-prometheus-sidecar.git   #Add upstream as a remote
 git pull --rebase upstream master  #Merge their upstream onto ours
 git push  #Update master in our GitHub repo to match theirs
-git checkout overleaf/master  #Switch to our master
+git checkout overleaf_master  #Switch to our master
 git merge master #Merge our copy of their master into ours
 ```
 
 ### Creating a purely internal pull request
 
-* Branch off of `overleaf/master`
-* Create a new pull request, change the base repo to ours, change the base branch to `overleaf/master`
+* Branch off of `overleaf_master`
+* Create a new pull request, change the base repo to ours, change the base branch to `overleaf_master`
 * Merge and delete branch
 
 ### Creating a pull request for us and upstream
 
 * Branch off of `master`
-* Create a new pull request, change the base repo to ours, change the base branch to `overleaf/master`
+* Create a new pull request, change the base repo to ours, change the base branch to `overleaf_master`
 * Merge, but don't delete branch
 * Create a new pull request, keep the base repo as theirs
 
