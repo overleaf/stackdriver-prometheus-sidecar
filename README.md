@@ -8,6 +8,34 @@ Custom metrics are a chargeable feature of Stackdriver Monitoring and there coul
 [![Build Status](https://travis-ci.com/Stackdriver/stackdriver-prometheus-sidecar.svg?branch=master)](https://travis-ci.com/Stackdriver/stackdriver-prometheus-sidecar)
 [![Coverage Status](https://coveralls.io/repos/github/Stackdriver/stackdriver-prometheus-sidecar/badge.svg?branch=master)](https://coveralls.io/github/Stackdriver/stackdriver-prometheus-sidecar?branch=master)
 
+## Overleaf Development
+
+The `master` branch of this repository will follow the upstream `master`. Our internal pull requests will be merged into `overleaf/master`.
+
+### Process to update our master with lastest upstream master
+```
+git clone git@github.com:overleaf/stackdriver-prometheus-sidecar.git
+git remote add upstream https://github.com/Stackdriver/stackdriver-prometheus-sidecar.git   #Add upstream as a remote
+git pull --rebase upstream master  #Merge their upstream onto ours
+git push  #Update master in our GitHub repo to match theirs
+git checkout overleaf/master  #Switch to our master
+git merge master #Merge our copy of their master into ours
+```
+
+### Creating a purely internal pull request
+
+* Branch off of `overleaf/master`
+* Create a new pull request, change the base repo to ours, change the base branch to `overleaf/master`
+* Merge and delete branch
+
+### Creating a pull request for us and upstream
+
+* Branch off of `master`
+* Create a new pull request, change the base repo to ours, change the base branch to `overleaf/master`
+* Merge, but don't delete branch
+* Create a new pull request, keep the base repo as theirs
+
+
 ## Installation
 
 To install the sidecar on a local machine run:
