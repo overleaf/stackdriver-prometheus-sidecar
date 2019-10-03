@@ -63,15 +63,6 @@ var (
 		},
 		[]string{queue},
 	)
-	droppedSamplesTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: namespace,
-			Subsystem: subsystem,
-			Name:      "dropped_samples_total",
-			Help:      "Total number of samples which were dropped due to the queue being full.",
-		},
-		[]string{queue},
-	)
 	sentBatchDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Namespace: namespace,
@@ -114,7 +105,6 @@ var (
 func init() {
 	prometheus.MustRegister(succeededSamplesTotal)
 	prometheus.MustRegister(failedSamplesTotal)
-	prometheus.MustRegister(droppedSamplesTotal)
 	prometheus.MustRegister(sentBatchDuration)
 	prometheus.MustRegister(queueLength)
 	prometheus.MustRegister(queueCapacity)
@@ -197,13 +187,11 @@ func NewQueueManager(logger log.Logger, cfg config.QueueConfig, clientFactory St
 	sentBatchDuration.WithLabelValues(t.queueName)
 	succeededSamplesTotal.WithLabelValues(t.queueName)
 	failedSamplesTotal.WithLabelValues(t.queueName)
-	droppedSamplesTotal.WithLabelValues(t.queueName)
 
 	return t, nil
 }
 
-// Append queues a sample to be sent to the remote storage. It drops the
-// sample on the floor if the queue is full.
+// Append queues a sample to be sent to the Stackdriver API.
 // Always returns nil.
 func (t *QueueManager) Append(hash uint64, sample *monitoring_pb.TimeSeries) error {
 	queueLength.WithLabelValues(t.queueName).Inc()
